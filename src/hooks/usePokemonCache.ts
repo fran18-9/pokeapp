@@ -2,32 +2,43 @@ import { useEffect, useRef, useState } from "react";
 import type { PokemonData } from "../types/PokemonData";
 
 const API_URL = "https://pokeapi.co/api/v2/pokemon/";
-const CACHE_PREFIX = "pokeapi_pokemon_";
 const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
 
 type CacheData = { data: PokemonData; timestamp: number };
 
-function getCacheKey(name: string): string {
-    return `${CACHE_PREFIX}${name}`;
+function openDB(): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open("PokeAppDB", 1);
+        request.onupgradeneeded = () => {
+            request.result.createObjectStore("pokemonCache", { keyPath: "name" });
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    })
 }
 
-function getCache(name: string): CacheData | null {
-    const raw = localStorage.getItem(getCacheKey(name));
-    if (!raw) return null;
-    try {
-        return JSON.parse(raw);
-    } catch {
-        return null;
-    }
+async function getCache(name: string): Promise<CacheData | null> {
+    const db = await openDB();
+    const tx = db.transaction("pokemonCache", "readonly");
+    const store = tx.objectStore("pokemonCache");
+    return new Promise((resolve, reject) => {
+        const request = store.get(name);
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject(request.error);
+        tx.oncomplete = () => db.close();
+    });
 }
 
-function setCache(name: string, data: PokemonData): void {
-    localStorage.setItem(
-        getCacheKey(name),
-        JSON.stringify({
-            data,
-            timestamp: Date.now()
-        }));
+async function setCache(name: string, data: PokemonData): Promise<void> {
+    const db = await openDB();
+    const tx = db.transaction("pokemonCache", "readwrite");
+    const store = tx.objectStore("pokemonCache");
+    await new Promise<void>((resolve, reject) => {
+        const request = store.put({ name, data, timestamp: Date.now() });
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+        tx.oncomplete = () => db.close();
+    });
 }
 
 export function usePokemonCache() {
@@ -49,16 +60,16 @@ export function usePokemonCache() {
         setData(null);
         setError(null);
 
-        if (!isMounted.current) return;
-        const cache = getCache(name);
-        const now = Date.now();
-        if (cache && now - cache.timestamp < ONE_MONTH_MS) {
-            setData(cache.data);
-            setLoading(false);
-            return;
-        }
-
         try {
+            if (!isMounted.current) return;
+            const cache = await getCache(name);
+            const now = Date.now();
+            if (cache && now - cache.timestamp < ONE_MONTH_MS) {
+                setData(cache.data);
+                setLoading(false);
+                return;
+            }
+
             const response = await fetch(API_URL + name + '/');
             if (!isMounted.current) return; // Prevent state update if unmounted
             if (response.ok) {
