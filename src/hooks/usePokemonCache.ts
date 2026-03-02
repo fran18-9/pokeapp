@@ -60,16 +60,16 @@ export function usePokemonCache() {
         setData(null);
         setError(null);
 
-        if (!isMounted.current) return;
-        const cache = await getCache(name);
-        const now = Date.now();
-        if (cache && now - cache.timestamp < ONE_MONTH_MS) {
-            setData(cache.data);
-            setLoading(false);
-            return;
-        }
-
         try {
+            if (!isMounted.current) return;
+            const cache = await getCache(name);
+            const now = Date.now();
+            if (cache && now - cache.timestamp < ONE_MONTH_MS) {
+                setData(cache.data);
+                setLoading(false);
+                return;
+            }
+
             const response = await fetch(API_URL + name + '/');
             if (!isMounted.current) return; // Prevent state update if unmounted
             if (response.ok) {
