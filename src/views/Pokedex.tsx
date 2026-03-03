@@ -21,7 +21,6 @@ export default function Pokedex() {
                 <h1 className="text-3xl font-bold text-center mb-4 text-gray-700">Pokédex</h1>
                 <Form onSubmit={(name: string) => { fetchPokemon(name.toLowerCase()); setSearched(true); }} loading={loading} />
                 <div className="flex justify-end mb-2">
-                    <Versions value={version} onChange={(verName: string) => setVersion(verName)} />
                 </div>
                 {loading && <div className="text-center mt-4 text-yellow-600">Loading...</div>}
                 {error && <div className="text-center mt-4 text-red-600">{error}</div>}
@@ -54,6 +53,7 @@ export default function Pokedex() {
                                 ))}
                             </div>
                             <h3 className="text-xl font-semibold text-gray-700 mb-2">Moveset {version}</h3>
+                            <Versions value={version} onChange={(verName: string) => setVersion(verName)} />
                             <div className="max-h-40 overflow-y-auto">
                                 {moveSections.map(section => (
                                     <div key={section.key} className="mb-3">
