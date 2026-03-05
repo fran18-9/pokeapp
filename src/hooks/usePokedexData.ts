@@ -2,6 +2,7 @@
 import { useMemo } from "react";
 import { formatAbilityName } from "../utils/formatAbilityName";
 import type { PokemonData } from "../types/PokemonData";
+import { formatMoveName } from "../utils/formatMoveName";
 
 type Move = {
     name: string;
@@ -30,7 +31,7 @@ export function usePokedexData(data: PokemonData | null, version: string) {
         ).map(m => {
             const vgd = m.version_group_details.find(vgp => vgp.version_group.name === version);
             return {
-                name: m.move.name,
+                name: formatMoveName(m.move.name),
                 level: vgd?.level_learned_at,
                 method: vgd?.move_learn_method.name
             };
