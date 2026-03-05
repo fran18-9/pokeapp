@@ -1,5 +1,6 @@
 // Custom hook to process and organize Pokedex data
 import { useMemo } from "react";
+import { formatAbilityName } from "../utils/formatAbilityName";
 import type { PokemonData } from "../types/PokemonData";
 
 type Move = {
@@ -62,7 +63,7 @@ export function usePokedexData(data: PokemonData | null, version: string) {
     const abilities: Ability[] = useMemo(() => {
         if (!data?.abilities) return [];
         return data.abilities.map(a => ({
-            name: a.ability.name,
+            name: formatAbilityName(a.ability.name),
             hidden: a.is_hidden
         }));
     }, [data]);
