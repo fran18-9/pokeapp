@@ -1,10 +1,4 @@
-import type { PokemonData } from "../types/PokemonData";
-
-type CardData = Pick<PokemonData, "id" | "name" | "sprites" | "cries">;
-
-type CardProps = {
-    data: CardData | null;
-};
+import type { CardProps } from "../types/CardData";
 
 export default function Card({ data }: CardProps) {
     if (!data) return null;
