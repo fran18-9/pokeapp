@@ -4,6 +4,7 @@ import Card from "../components/Card";
 import { usePokedexData } from "../hooks/usePokedexData";
 import Versions from "../components/Versions";
 import { useState } from "react";
+import { formatName } from "../utils/formatName";
 
 
 export default function Pokedex() {
@@ -40,7 +41,7 @@ export default function Pokedex() {
                             <h3 className="text-xl font-semibold text-gray-700 mb-2">Types</h3>
                             <div className="flex gap-2 mb-4">
                                 {data.types?.map(t => (
-                                    <span key={t.type.name} className="bg-indigo-200 px-3 py-1 rounded-full text-indigo-800 font-semibold">{t.type.name}</span>
+                                    <span key={formatName(t.type.name)} className="bg-indigo-200 px-3 py-1 rounded-full text-indigo-800 font-semibold">{formatName(t.type.name)}</span>
                                 ))}
                             </div>
                             <h3 className="text-xl font-semibold text-gray-700 mb-2">Base Stats</h3>
