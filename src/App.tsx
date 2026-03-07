@@ -1,14 +1,25 @@
+import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from "react-router"
+import RootLayout from "./layout/RootLayout"
+import Pokedex from "./views/Pokedex"
+import Habitat from "./views/Habitat"
+import TeamBuilder from "./views/TeamBuilder"
+import Home from "./views/Home"
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<RootLayout />}>
+      <Route index element={<Home />} />
+      <Route path="pokedex" element={<Pokedex />} />
+      <Route path="habitat" element={<Habitat />} />
+      <Route path="teambuilder" element={<TeamBuilder />} />
+    </Route>
+  )
+)
+
 function App() {
   return (
-    <div className="mx-auto w-lg bg-red-500 mt-5 text-gray-50 text-center p-4 rounded-md">
-      <h1 className="text-xl font-bold mb-3">React PokeTool!</h1>
-      <ul>
-        <li>Pokedex</li>
-        <li>Habitats</li>
-        <li>Team Builder</li>
-      </ul>
-    </div>
+    <RouterProvider router={router} />
   )
 }
 
-export default App
+export default App;
